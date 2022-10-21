@@ -19,3 +19,9 @@ Sourcemaps are mostly used in the JavaScript ecosystem, to allow pointing to ori
 ## Known issues
 
 You must provide the "source root" as an argument - it is not extracted from the SARIF file.
+
+Partial Fingerprints are not remapped to the original source file.
+
+Non-mapped locations in the SARIF are not remapped and are left unchanged.
+
+No mapped locations with relative paths (probable library code) are removed.
