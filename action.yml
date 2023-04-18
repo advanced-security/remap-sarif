@@ -1,0 +1,24 @@
+name: 'Remap SARIF'
+description: 'Remap SARIF results to original line numbers using a SourceMap'
+branding:
+  icon: 'move'
+  color: 'blue'
+inputs:
+  sourceroot:
+    description: 'Path to the root of the source code'
+    default: $GITHUB_WORKSPACE
+  input:
+    description: 'Path to the input SARIF file'
+    required: true
+  output:
+    description: 'Path to the output SARIF file'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: remap
+      run: |
+        unset LD_PRELOAD
+        unset PYTHONSTARTUP
+        python3 "${{ github.action_path }}/remap_sarif.py" "${{ inputs.input }}" "${{ inputs.sourceroot }}" --output-sarif "${{ inputs.output }}"
+      shell: bash
