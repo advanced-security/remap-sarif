@@ -1,5 +1,7 @@
 # Remap SARIF
 
+> ℹ️ This is an _unofficial_ tool created by Field Security Services, and is not officially supported by GitHub.
+
 *Remap SARIF* uses a [source map](https://web.dev/source-maps/) to change line numbers in SARIF files, to map them from the minified or transpiled file locations to the original source file locations.
 
 It accepts input/output SARIF file paths (which can be the same location), as well as an optional root path for the source code.
@@ -7,6 +9,8 @@ It accepts input/output SARIF file paths (which can be the same location), as we
 For any source files that are found to have a source map, it uses that to change the source locations.
 
 This could be useful if a scan has been done on a minified file, or a transpiled file (from high-level languages such as TypeScript, CoffeeScript or Dart, for example, or from a JavaScript framework such as React, Angular, Vue, Svelte, Next.js, etc.).
+
+> ℹ️ This is an _unofficial_ tool created by Field Security Services, and is not officially supported by GitHub.
 
 ## Usage as an Action
 
