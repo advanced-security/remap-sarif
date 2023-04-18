@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Remap a SARIF file with sourcemaps."""
+"""Remap a SARIF file to original source file locations with source maps."""
 
 import sys
 import argparse
