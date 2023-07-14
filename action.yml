@@ -21,5 +21,5 @@ runs:
         unset LD_PRELOAD
         unset PYTHONSTARTUP
         python3 -mpip install -r "${{ github.action_path }}/requirements.txt"
-        python3 "${{ github.action_path }}/remap_sarif.py" "${{ inputs.input }}" "${{ inputs.sourceroot }}" --output-sarif "${{ inputs.output }}"
+        python3 "${{ github.action_path }}/remap_sarif.py" "${{ inputs.input }}" "${{ inputs.sourceroot }}" --output "${{ inputs.output }}"
       shell: bash
