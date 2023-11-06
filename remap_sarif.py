@@ -42,7 +42,7 @@ class Mapper:
             except IOError as err:
                 raise IndexError("Mapping error: %s", err)
             if map_file is not None:
-                with open(os.path.join(self.root, map_file)) as f:
+                with open(os.path.join(self.root, os.path.dirname(filepath), map_file)) as f:
                     smap = sourcemap.load(f)
                     self.cache["file"] = smap
             else:
