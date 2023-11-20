@@ -7,6 +7,7 @@ import json
 import logging
 import os
 import sourcemap
+from pathlib import Path
 
 LOG = logging.getLogger(__name__)
 
@@ -28,21 +29,24 @@ class Mapper:
     """Remap source file locations with a source root and a cache of source maps."""
 
     def __init__(self, sourceroot) -> None:
-        self.root = sourceroot
+        self.root = Path(sourceroot)
         self.cache: dict[str, sourcemap.objects.SourceMapIndex] = {}
 
-    def remap(self, filepath, line, col) -> tuple[str, str, int, int]:
+    def remap(self, filename, line, col) -> tuple[str, str, int, int]:
         """Remap the locations."""
+        filepath = self.root / Path(filename)
+        filedir = filepath.parent
+
         if filepath in self.cache:
             smap = self.cache["file"]
         else:
             try:
                 map_file = sourcemap.discover(
-                    open(os.path.join(self.root, filepath)).read())
+                    open(filepath.as_posix()).read())
             except IOError as err:
                 raise IndexError("Mapping error: %s", err)
             if map_file is not None:
-                with open(os.path.join(self.root, map_file)) as f:
+                with open((filedir / Path(map_file)).as_posix()) as f:
                     smap = sourcemap.load(f)
                     self.cache["file"] = smap
             else:
@@ -53,7 +57,7 @@ class Mapper:
         except IndexError:
             raise IndexError(
                 f"Mapping error: {filepath}!{line}:{col} not found")
-        return (loc.name, loc.src, loc.src_line, loc.src_col)
+        return (loc.name, (filedir / Path(loc.src)).resolve().absolute().as_posix(), loc.src_line, loc.src_col)
 
 
 def main():
