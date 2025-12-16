@@ -30,15 +30,24 @@ class Mapper:
 
     def __init__(self, sourceroot) -> None:
         self.root = Path(sourceroot)
-        self.cache: dict[str, sourcemap.objects.SourceMapIndex] = {}
+        self.cache: dict[Path, sourcemap.objects.SourceMapIndex] = {}
 
     def remap(self, filename, line, col) -> tuple[str, str, int, int]:
-        """Remap the locations."""
+        """Remap the locations.
+        
+        Args:
+            filename: The file to remap
+            line: 1-based line number (SARIF spec)
+            col: 1-based column number (SARIF spec)
+            
+        Returns:
+            Tuple of (name, source_file, 1-based line, 1-based column)
+        """
         filepath = self.root / Path(filename)
         filedir = filepath.parent
 
         if filepath in self.cache:
-            smap = self.cache["file"]
+            smap = self.cache[filepath]
         else:
             try:
                 map_file = sourcemap.discover(
@@ -48,16 +57,18 @@ class Mapper:
             if map_file is not None:
                 with open((filedir / Path(map_file)).as_posix()) as f:
                     smap = sourcemap.load(f)
-                    self.cache["file"] = smap
+                    self.cache[filepath] = smap
             else:
                 raise IndexError(
                     f"Mapping error: map file for {filepath} not found")
         try:
-            loc = smap.lookup(line, col)
+            # sourcemap library uses 0-based indexing, convert from 1-based SARIF
+            loc = smap.lookup(line - 1, col - 1)
         except IndexError:
             raise IndexError(
                 f"Mapping error: {filepath}!{line}:{col} not found")
-        return (loc.name, (filedir / Path(loc.src)).resolve().absolute().as_posix(), loc.src_line, loc.src_col)
+        # Convert back to 1-based indexing for SARIF spec
+        return (loc.name, (filedir / Path(loc.src)).resolve().absolute().as_posix(), loc.src_line + 1, loc.src_col + 1)
 
 
 def main():
