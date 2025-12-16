@@ -30,7 +30,7 @@ class Mapper:
 
     def __init__(self, sourceroot) -> None:
         self.root = Path(sourceroot)
-        self.cache: dict[str, sourcemap.objects.SourceMapIndex] = {}
+        self.cache: dict[Path, sourcemap.objects.SourceMapIndex] = {}
 
     def remap(self, filename, line, col) -> tuple[str, str, int, int]:
         """Remap the locations.
@@ -46,9 +46,8 @@ class Mapper:
         filepath = self.root / Path(filename)
         filedir = filepath.parent
 
-        cache_key = filepath.as_posix()
-        if cache_key in self.cache:
-            smap = self.cache[cache_key]
+        if filepath in self.cache:
+            smap = self.cache[filepath]
         else:
             try:
                 map_file = sourcemap.discover(
@@ -58,7 +57,7 @@ class Mapper:
             if map_file is not None:
                 with open((filedir / Path(map_file)).as_posix()) as f:
                     smap = sourcemap.load(f)
-                    self.cache[cache_key] = smap
+                    self.cache[filepath] = smap
             else:
                 raise IndexError(
                     f"Mapping error: map file for {filepath} not found")
