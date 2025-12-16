@@ -46,8 +46,9 @@ class Mapper:
         filepath = self.root / Path(filename)
         filedir = filepath.parent
 
-        if filepath in self.cache:
-            smap = self.cache["file"]
+        cache_key = filepath.as_posix()
+        if cache_key in self.cache:
+            smap = self.cache[cache_key]
         else:
             try:
                 map_file = sourcemap.discover(
@@ -57,7 +58,7 @@ class Mapper:
             if map_file is not None:
                 with open((filedir / Path(map_file)).as_posix()) as f:
                     smap = sourcemap.load(f)
-                    self.cache["file"] = smap
+                    self.cache[cache_key] = smap
             else:
                 raise IndexError(
                     f"Mapping error: map file for {filepath} not found")
